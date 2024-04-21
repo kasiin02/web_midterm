@@ -113,7 +113,7 @@ def show_menu() -> None:
     print("-"*19)
 
 
-def menu_function(choice, db_path) -> None:
+def menu_function(choice: str, db_path: str) -> None:
     '''
         選單功能
     Args：
