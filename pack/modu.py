@@ -3,7 +3,7 @@ import json
 import sqlite3
 
 
-def create_database(db_path: str):
+def create_database(db_path: str) -> None:
     '''
         建立資料庫
     Args：
@@ -29,7 +29,7 @@ def create_database(db_path: str):
     ''')
 
 
-def read_users_file(csv_file_path: str, db_path: str):
+def read_users_file(csv_file_path: str, db_path: str) -> None:
     '''
         建立使用者資料表
     Args：
@@ -65,7 +65,7 @@ def read_users_file(csv_file_path: str, db_path: str):
         print(f'錯誤代碼為：{e}')
 
 
-def read_books_file(json_file_path: str, db_path: str):
+def read_books_file(json_file_path: str, db_path: str) -> None:
     '''
         建立書籍資料表
     Args：
@@ -97,7 +97,7 @@ def read_books_file(json_file_path: str, db_path: str):
         print(f'錯誤代碼為：{e}')
 
 
-def show_menu():
+def show_menu() -> None:
     '''
         顯示選單
     '''
@@ -113,7 +113,7 @@ def show_menu():
     print("-"*19)
 
 
-def menu_function(choice, db_path):
+def menu_function(choice, db_path) -> None:
     '''
         選單功能
     Args：
@@ -183,7 +183,7 @@ def menu_function(choice, db_path):
     conn.commit()
 
 
-def add_record(cursor: any, title: str, author: str, publisher: str, year: str):
+def add_record(cursor: any, title: str, author: str, publisher: str, year: str) -> None:
     '''
         新增紀錄
     Args：
@@ -196,6 +196,8 @@ def add_record(cursor: any, title: str, author: str, publisher: str, year: str):
         publisher：出版社
 
         year：年份
+    Raises:
+        ValueError: 給定參數為空字串。
     '''
     if title == "" or author == "" or publisher == "" or year == "":
         raise ValueError("給定的條件不足，無法進行新增作業")
@@ -205,13 +207,15 @@ def add_record(cursor: any, title: str, author: str, publisher: str, year: str):
     cursor.execute(query, (title, author, publisher, year))
 
 
-def delete_record(cursor: any, title: str):
+def delete_record(cursor: any, title: str) -> None:
     '''
         刪除紀錄
     Args:
         cursor: 資料庫連結
 
         title: 書名
+    Raises:
+        ValueError: 給定參數為空字串。
     '''
     if title == "":
         raise ValueError("給定的條件不足，無法進行刪除作業")
@@ -220,7 +224,7 @@ def delete_record(cursor: any, title: str):
     cursor.execute(query, (title,))
 
 
-def update_record(cursor: any, id: str, title: str, author: str, publisher: str, year: str):
+def update_record(cursor: any, id: str, title: str, author: str, publisher: str, year: str) -> None:
     '''
         修改資料
     Args：
@@ -235,6 +239,8 @@ def update_record(cursor: any, id: str, title: str, author: str, publisher: str,
         publisher：新出版社
 
         year：新年份
+    Raises:
+        ValueError: 給定參數為空字串。
     '''
     if id == "" or title == "" or author == "" or publisher == "" or year == "":
         raise ValueError("給定的條件不足，無法進行修改作業")
@@ -246,13 +252,15 @@ def update_record(cursor: any, id: str, title: str, author: str, publisher: str,
     list_records(cursor)
 
 
-def search_record(cursor: any, key_word: str):
+def search_record(cursor: any, key_word: str) -> None:
     '''
         搜尋紀錄
     Args:
         cousor: 資料庫連結
 
         key_word: 關鍵字
+    Raises:
+        ValueError: 給定參數為空字串或找不到參數。
     '''
 
     if key_word == "":
@@ -268,11 +276,13 @@ def search_record(cursor: any, key_word: str):
         raise ValueError("查無此關鍵字")
 
 
-def list_records(cursor: any):
+def list_records(cursor: any) -> None:
     '''
         顯示書籍資料庫
     Args:
         cursor: 資料庫連結
+    Raises:
+        ValueError: 不存在資料表。
     '''
 
     query = '''SELECT * FROM books;'''
