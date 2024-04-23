@@ -270,7 +270,7 @@ def search_record(cursor: any, key_word: str) -> None:
     cursor.execute(query, (key_word, key_word, key_word, key_word))
     book = cursor.fetchone()
     if book:
-        formatted_str = "| {:<10} | {:<10} | {:<15} | {:<6} |".format(book[1], book[2], book[3], book[4])
+        formatted_str = "|{:<10}|{:<10}|{:<10}|{:<6}|".format(book[1], book[2], book[3], book[4])
         print(formatted_str)
     else:
         raise ValueError("查無此關鍵字")
@@ -289,9 +289,9 @@ def list_records(cursor: any) -> None:
     cursor.execute(query)
     books = cursor.fetchall()
     if books:
-        print("|{:^9}|{:^12}|{:^13}|{:^9}|".format("title", "author", "publisher", "year"))
+        print("|{:^10}|{:^10}|{:^13}|{:^6}|".format("書籍", "作者", "出版社", "年份"))
         for book in books:
-            formatted_str = "|{:<8}|{:<7}|{:<8}|{:<9}|".format(book[1], book[2], book[3], book[4])
+            formatted_str = "|{:<10}|{:<8}|{:<10}|{:<6}|".format(book[1], book[2], book[3], book[4])
             print(formatted_str)
 
     else:
