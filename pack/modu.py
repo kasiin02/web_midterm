@@ -266,11 +266,11 @@ def search_record(cursor: any, key_word: str) -> None:
     if key_word == "":
         raise ValueError("給定的條件不足，無法進行查詢作業")
 
-    query = '''SELECT * FROM books WHERE title = ? OR author = ? OR publisher = ? OR year = ?;'''
+    query = '''SELECT title, author, publisher, year FROM books WHERE title = ? OR author = ? OR publisher = ? OR year = ?;'''
     cursor.execute(query, (key_word, key_word, key_word, key_word))
     book = cursor.fetchone()
     if book:
-        formatted_str = "|{:<10}|{:<10}|{:<10}|{:<6}|".format(book[1], book[2], book[3], book[4])
+        formatted_str = f"|{book[0]:{chr(12288)}<5}|{book[1]:{chr(12288)}<8}|{book[2]:{chr(12288)}<10}|{book[3]:{chr(12288)}<6}|"
         print(formatted_str)
     else:
         raise ValueError("查無此關鍵字")
@@ -289,9 +289,9 @@ def list_records(cursor: any) -> None:
     cursor.execute(query)
     books = cursor.fetchall()
     if books:
-        print("|{:^10}|{:^10}|{:^13}|{:^6}|".format("書籍", "作者", "出版社", "年份"))
+        print(f"|{'書籍':{chr(12288)}^5}|{'作者':{chr(12288)}^8}|{'出版社':{chr(12288)}^10}|{'年份':{chr(12288)}^6}|")
         for book in books:
-            formatted_str = "|{:<10}|{:<8}|{:<10}|{:<6}|".format(book[1], book[2], book[3], book[4])
+            formatted_str = f"|{book[1]:{chr(12288)}<5}|{book[2]:{chr(12288)}<8}|{book[3]:{chr(12288)}<10}|{book[4]:{chr(12288)}<8}|"
             print(formatted_str)
 
     else:
