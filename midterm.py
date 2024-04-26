@@ -40,9 +40,8 @@ while True:
             if user_input == '':  # 檢查輸入是否為空字符串
                 break  # 輸入為空，退出迴圈
             # 使用用戶輸入和 DB_NAME 作為參數調用 lib.menu_function
-            lib.menu_function(user_input, DB_NAME)
+            lib.menu_function(user_input, conn)
         break
-
 # 關閉 cursor 和連接
 cursor.close()
 conn.close()

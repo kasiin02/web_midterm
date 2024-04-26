@@ -113,26 +113,24 @@ def show_menu() -> None:
     print("-"*19)
 
 
-def menu_function(choice: str, db_path: str) -> None:
+def menu_function(choice: str, conn: sqlite3.Connection) -> None:
     '''
         選單功能
     Args：
         choice：選項
 
-        db_path：資料庫位置
+        conn：資料庫連結
     '''
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
     if choice == '1':
         title = input('請輸入要新增的標題：')
         author = input('請輸入要新增的作者：')
         publisher = input('請輸入要新增的出版社：')
         year = input('請輸入要新增的年份：')
         try:
-            add_record(cursor, title, author, publisher, year)
+            add_record(conn, title, author, publisher, year)
 
-            print('異動 1 記錄')
-            list_records(cursor)
+            print(f'異動 {conn.total_changes} 記錄')
+            list_records(conn)
 
         except ValueError as e:
             print(f"=>:{e}")
@@ -140,16 +138,16 @@ def menu_function(choice: str, db_path: str) -> None:
     elif choice == '2':
         book_id = input('請問要刪除哪一本書？')
         try:
-            delete_record(cursor, book_id)
+            delete_record(conn, book_id)
 
-            print('異動 1 記錄')
-            list_records(cursor)
+            print(f'異動 {conn.total_changes} 記錄')
+            list_records(conn)
 
         except ValueError as e:
             print(f"=>:{e}")
 
     elif choice == '3':
-        list_records(cursor)
+        list_records(conn)
 
         book_id = input('請問要修改哪一本書的標題？')
         title = input('請輸入要更改的標題：')
@@ -157,22 +155,24 @@ def menu_function(choice: str, db_path: str) -> None:
         publisher = input('請輸入要更改的出版社：')
         year = input('請輸入要更改的年份：')
         try:
-            update_record(cursor, book_id, title, author, publisher, year)
+            update_record(conn, book_id, title, author, publisher, year)
 
+            print(f'異動 {conn.total_changes} 記錄')
+            list_records(conn)
         except ValueError as e:
             print(f"=>:{e}")
 
     elif choice == '4':
         key_word = input('請輸入想查詢的關鍵字：')
         try:
-            search_record(cursor, key_word)
+            search_record(conn, key_word)
 
         except ValueError as e:
             print(f"=>:{e}")
 
     elif choice == '5':
         try:
-            list_records(cursor)
+            list_records(conn)
 
         except ValueError as e:
             print(f"=>:{e}")
@@ -183,11 +183,11 @@ def menu_function(choice: str, db_path: str) -> None:
     conn.commit()
 
 
-def add_record(cursor: any, title: str, author: str, publisher: str, year: str) -> None:
+def add_record(conn: sqlite3.Connection, title: str, author: str, publisher: str, year: str) -> None:
     '''
         新增紀錄
     Args：
-        cursor：資料庫連結
+        conn：資料庫連結
 
         title：書名
 
@@ -201,17 +201,17 @@ def add_record(cursor: any, title: str, author: str, publisher: str, year: str) 
     '''
     if title == "" or author == "" or publisher == "" or year == "":
         raise ValueError("給定的條件不足，無法進行新增作業")
-
+    cursor = conn.cursor()
     query = '''INSERT INTO books (title, author, publisher, year)
             VALUES (?, ?, ?, ?);'''
     cursor.execute(query, (title, author, publisher, year))
 
 
-def delete_record(cursor: any, title: str) -> None:
+def delete_record(conn: sqlite3.Connection, title: str) -> None:
     '''
         刪除紀錄
     Args:
-        cursor: 資料庫連結
+        conn: 資料庫連結
 
         title: 書名
     Raises:
@@ -219,16 +219,16 @@ def delete_record(cursor: any, title: str) -> None:
     '''
     if title == "":
         raise ValueError("給定的條件不足，無法進行刪除作業")
-
+    cursor = conn.cursor()
     query = '''DELETE FROM books WHERE title = ?;'''
     cursor.execute(query, (title,))
 
 
-def update_record(cursor: any, id: str, title: str, author: str, publisher: str, year: str) -> None:
+def update_record(conn: sqlite3.Connection, id: str, title: str, author: str, publisher: str, year: str) -> None:
     '''
         修改資料
     Args：
-        cursor: 資料庫連結
+        conn: 資料庫連結
 
         id: 修改書名
 
@@ -244,19 +244,17 @@ def update_record(cursor: any, id: str, title: str, author: str, publisher: str,
     '''
     if id == "" or title == "" or author == "" or publisher == "" or year == "":
         raise ValueError("給定的條件不足，無法進行修改作業")
-
+    cursor = conn.cursor()
     query = '''UPDATE books SET title = ?, author = ?, publisher = ?, year = ?
             WHERE title = ?;'''
     cursor.execute(query, (title, author, publisher, year, id))
-    print('異動 1 記錄')
-    list_records(cursor)
 
 
-def search_record(cursor: any, key_word: str) -> None:
+def search_record(conn: sqlite3.Connection, key_word: str) -> None:
     '''
         搜尋紀錄
     Args:
-        cousor: 資料庫連結
+        conn: 資料庫連結
 
         key_word: 關鍵字
     Raises:
@@ -265,7 +263,7 @@ def search_record(cursor: any, key_word: str) -> None:
 
     if key_word == "":
         raise ValueError("給定的條件不足，無法進行查詢作業")
-
+    cursor = conn.cursor()
     query = '''SELECT title, author, publisher, year FROM books WHERE title = ? OR author = ? OR publisher = ? OR year = ?;'''
     cursor.execute(query, (key_word, key_word, key_word, key_word))
     book = cursor.fetchone()
@@ -276,15 +274,15 @@ def search_record(cursor: any, key_word: str) -> None:
         raise ValueError("查無此關鍵字")
 
 
-def list_records(cursor: any) -> None:
+def list_records(conn: sqlite3.Connection) -> None:
     '''
         顯示書籍資料庫
     Args:
-        cursor: 資料庫連結
+        conn: 資料庫連結
     Raises:
         ValueError: 不存在資料表。
     '''
-
+    cursor = conn.cursor()
     query = '''SELECT * FROM books;'''
     cursor.execute(query)
     books = cursor.fetchall()
